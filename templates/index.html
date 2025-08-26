@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NFL Teams</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f8f8; }
+        table { border-collapse: collapse; width: 90%; margin: 2em auto; background: #fff; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: #333; color: #fff; }
+        img { height: 40px; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">NFL Teams</h2>
+    <table>
+        <tr>
+            <th>Logo</th>
+            <th>Abbreviation</th>
+            <th>Name</th>
+            <th>Division</th>
+        </tr>
+        {% for team in teams %}
+        <tr>
+            <td><img src="{{ team['team_logo_espn'] }}" alt="{{ team['team_abbr'] }}"></td>
+            <td>{{ team['team_abbr'] }}</td>
+            <td>{{ team['team_name'] }}</td>
+            <td>{{ team['team_division'] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
