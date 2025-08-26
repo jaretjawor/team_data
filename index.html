@@ -49,12 +49,44 @@
 
         function renderTeamDetails(team) {
             let html = `<div style='display:inline-block; background:#fff; padding:2em; border-radius:8px; box-shadow:0 2px 8px #ccc;'>
-                <img src="${team.team_logo_espn}" alt="${team.team_abbr}" style="height:60px;"><br><br>
+                <img id="teamLogoImg" src="${team.team_logo_espn}" alt="${team.team_abbr}" style="height:60px;"><br><br>
                 <strong>Name:</strong> ${team.team_name}<br>
                 <strong>Abbreviation:</strong> ${team.team_abbr}<br>
                 <strong>Division:</strong> ${team.team_division}
             </div>`;
             document.getElementById('teamDetails').innerHTML = html;
+
+            // Change background color to dominant color of logo
+            const img = document.getElementById('teamLogoImg');
+            img.crossOrigin = "Anonymous";
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                try {
+                    const data = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                    let r = 0, g = 0, b = 0, count = 0;
+                    for (let i = 0; i < data.length; i += 4) {
+                        // Ignore transparent pixels
+                        if (data[i+3] > 128) {
+                            r += data[i];
+                            g += data[i+1];
+                            b += data[i+2];
+                            count++;
+                        }
+                    }
+                    if (count > 0) {
+                        r = Math.round(r / count);
+                        g = Math.round(g / count);
+                        b = Math.round(b / count);
+                        document.body.style.background = `rgb(${r},${g},${b})`;
+                    }
+                } catch (e) {
+                    document.body.style.background = '#f8f8f8';
+                }
+            };
         }
 
         // Automatically fetch and load team.data.esv
