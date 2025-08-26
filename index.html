@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NFL Teams Viewer</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f8f8f8; }
+        table { border-collapse: collapse; width: 90%; margin: 2em auto; background: #fff; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: #333; color: #fff; }
+        img { height: 40px; }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">NFL Teams</h2>
+        <!-- File input removed, data loads automatically -->
+        <div id="dropdownContainer" style="text-align:center; margin-top:2em;"></div>
+        <div id="teamDetails" style="text-align:center; margin-top:2em;"></div>
+        <script>
+        let teams = [];
+
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',');
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                let obj = {};
+                headers.forEach((h, i) => obj[h] = values[i]);
+                return obj;
+            });
+        }
+
+        function renderDropdown(teams) {
+            let html = '<select id="teamSelect"><option value="">Choose a team...</option>';
+            teams.forEach((team, idx) => {
+                html += `<option value="${idx}">${team.team_name}</option>`;
+            });
+            html += '</select>';
+            document.getElementById('dropdownContainer').innerHTML = html;
+            document.getElementById('teamSelect').addEventListener('change', function(e) {
+                const idx = e.target.value;
+                if (idx === "") {
+                    document.getElementById('teamDetails').innerHTML = '';
+                    return;
+                }
+                renderTeamDetails(teams[idx]);
+            });
+        }
+
+        function renderTeamDetails(team) {
+            let html = `<div style='display:inline-block; background:#fff; padding:2em; border-radius:8px; box-shadow:0 2px 8px #ccc;'>
+                <img src="${team.team_logo_espn}" alt="${team.team_abbr}" style="height:60px;"><br><br>
+                <strong>Name:</strong> ${team.team_name}<br>
+                <strong>Abbreviation:</strong> ${team.team_abbr}<br>
+                <strong>Division:</strong> ${team.team_division}
+            </div>`;
+            document.getElementById('teamDetails').innerHTML = html;
+        }
+
+        // Automatically fetch and load team.data.esv
+        fetch('team.data.esv')
+            .then(response => response.text())
+            .then(text => {
+                teams = parseCSV(text);
+                renderDropdown(teams);
+            })
+            .catch(err => {
+                document.getElementById('dropdownContainer').innerHTML = '<p style="color:red;">Could not load team.data.esv</p>';
+            });
+        </script>
+</body>
+</html>
